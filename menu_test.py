@@ -6,7 +6,7 @@ from fighter import Fighter
 
 def MainGame():
     #game window
-    SCREEN_WIDTH = 1000
+    SCREEN_WIDTH = 900
     SCREEN_HEIGHT = 600
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("CrossVerse")
