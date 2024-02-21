@@ -1,153 +1,237 @@
-import pygame, sys
-from menu_button import Button
+import pygame
+import sys
+from pygame import mixer
 from fighter import Fighter
-from fighter2 import Fighter2
 
+mixer.init()
 pygame.init()
 
-'''def MainMenu():
-	screem = pygame.display.set_mode((1280, 720))
-	pygame.display.set_caption("Menu")
-
-	BG = pygame.image.load("assets/images/background/bg.jpg")
-
-	#def get_font(size): #Returns Press-Start-2P in the desired size
-
-	def play(): #Play screen
-		pygame.display.set_caption("Play")
-		
-		while True:
-			PLAY_MOUSE_POS = pygame.mouse.get_pos()
-
-			screen.fill("black")
-
-			PLAY_TEXT = get_font(45).render("This is the PLAY screen", True, "White")
-			PLAY_RECT = PLAY_TEXT.get_rect(center=(640, 460))
-			screen.blit(PLAY_TEXT, PLAY_RECT)
-
-			PLAY_BACK = Button(image=None, pos=(640, 460), 
-					  			text_input="BACK", font=get_font(75), base_colour="White", hovering_colour="Green")
-			
-
-			PLAY_BACK.changeColour(PLAY_MOUSE_POS)
-			PLAY_BACK.update(screen)
-
-			for event in pygame.event.get():
-				if event.type == pygame.QUIT:
-					pygame.quit()
-					sys.exit()
-				if event.type == pygame.MOUSEBUTTONDOWN:
-					if PLAY_BACK.checkForInput(PLAY_MOUSE_POS):
-						main_menu()
-
-			pygame.display.update()
-	
-	def options(): #Option screen
-		pygame.display.set_caption("Options")
-		
-		while True:
-			OPTIONS_MOUSE_POS = pygame.mouse.get_pos()
-
-			screen.fill("white")
-
-			OPTIONS_TEXT = get_font(45).render("This is the PLAY screen", True, "White")
-			OPTIONS_RECT = PLAY_TEXT.get_rect(center=(640, 460))
-			screen.blit(PLAY_TEXT, PLAY_RECT)
-
-			OPTIONS_BACK = Button(image=None, pos=(640, 460), 
-					  			text_input="BACK", font=get_font(75), base_colour="Black", hovering_colour="Green")
-			
-
-			OPTIONS_BACK.changeColour(PLAY_MOUSE_POS)
-			OPTIONS_BACK.update(screen)
-
-			for event in pygame.event.get():
-				if event.type == pygame.QUIT:
-					pygame.quit()
-					sys.exit()
-				if event.type == pygame.MOUSEBUTTONDOWN:
-					if OPTIONS_BACK.checkForInput(OPTIONS_MOUSE_POS):
-						main_menu()
-
-			pygame.display.update()
-	
-	def main_menu(): #Main Menu screen
-		pygame.display.set_caption("Menu")
-
-		while True:
-			screen.blit(BG, (0,0))
-
-			MENU_MOUSE_POS = pygame.mouse.get_pos()
-
-			MENU_TEXT = get_font(100).render("MAIN MENU", True, "#b68f40")
-			MENU_RECT = MENU_TEXT.get_rect(center=(640, 100))
-
-			PLAY_BUTTON = Button(image=pygame.image.load("assets/Play Rect.png"), pos=(640, 250), text_input="PLAY", font=get_font(75), base_colour="#d7fcd4", hovering_colour="White")
-			
-			OPTION = Button(image=pygame.image.load("assets/Option Rect.png"), pos=(640, 400), text_input="OPTIONS", font=get_font(75), base_colour="#d7fcd4", hovering_colour="White")
-			
-			QUIT = Button(image=pygame.image.load("assets/Quit Rect.png"), pos=(640, 550), text_input="QUIT", font=get_font(75), base_colour="#d7fcd4", hovering_colour="White")
-
-			screen.blit(MENU_TEXT, MENU_RECT)
-
-			for button in [PLAY_BUTTON, OPTIONS_BUTTON, QUIT_BUTTON]:
-				button.changeColour(MENU_MOUSE_POS)
-				button.update(screen)
-
-			for event in pygame.event.get():
-				if event.type == pygame.QUIT:
-					pygame.quit()
-					sys.exit()
-				if event.type == pygame.QUIT:
-					if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
-						play()
-					if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
-						options()
-					if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
-						pygame.quit()
-						sys.exit()
-
-			pygame.display.update()
-	main_menu()'''
-
-
 def MainGame():
-	#game window
-	SCREEN_WIDTH = 1500
-	SCREEN_HEIGHT = 600
-	screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-	pygame.display.set_caption("CrossVerse")
-	#set framerate
-	clock = pygame.time.Clock()
-	FPS = 60
-	#load background image
-	bg_image = pygame.image.load("assets/images/background/bg.jpg").convert_alpha()
-	#function for drawing background
-	def draw_bg():
-		scaled_bg = pygame.transform.scale(bg_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
-		screen.blit(scaled_bg, (0, 0))
-	#create two instanecs of fighters
-	fighter_1 = Fighter(300, 310)
-	fighter_2 = Fighter2(1150, 310)
-	#game loop
-	run = True
-	while run:
-		clock.tick(FPS)
-		#draw background
-		draw_bg()
-		#move fighters
-		fighter_1.move(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter_2)
-		fighter_2.move(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter_1)
-		#draw fighters
-		fighter_1.draw(screen)
-		fighter_2.draw(screen)
-		#event handle
-		for event in pygame.event.get():
-			if event.type == pygame.QUIT:
-				run = False
-		#update display
-		pygame.display.update()
-	#exit pygame
-	pygame.quit()
+  #create game window
+  SCREEN_WIDTH = 1000
+  SCREEN_HEIGHT = 600
 
-MainGame()
+  screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+  pygame.display.set_caption("Brawler")
+
+  #set framerate
+  clock = pygame.time.Clock()
+  FPS = 60
+
+  #define colours
+  RED = (255, 0, 0)
+  YELLOW = (255, 255, 0)
+  WHITE = (255, 255, 255)
+
+  #define game variables
+  intro_count = 3
+  last_count_update = pygame.time.get_ticks()
+  score = [0, 0]#player scores. [P1, P2]
+  round_over = False
+  ROUND_OVER_COOLDOWN = 2000
+
+  #define fighter variables
+  WARRIOR_SIZE = 162
+  WARRIOR_SCALE = 4
+  WARRIOR_OFFSET = [72, 56]
+  WARRIOR_DATA = [WARRIOR_SIZE, WARRIOR_SCALE, WARRIOR_OFFSET]
+  WIZARD_SIZE = 250
+  WIZARD_SCALE = 3
+  WIZARD_OFFSET = [112, 107]
+  WIZARD_DATA = [WIZARD_SIZE, WIZARD_SCALE, WIZARD_OFFSET]
+
+  #load music and sounds
+  pygame.mixer.music.load("assets/audio/music.mp3")
+  pygame.mixer.music.set_volume(0.1)
+  pygame.mixer.music.play(-1, 0.0, 5000)
+  sword_fx = pygame.mixer.Sound("assets/audio/sword.wav")
+  sword_fx.set_volume(0.5)
+  magic_fx = pygame.mixer.Sound("assets/audio/magic.wav")
+  magic_fx.set_volume(0.75)
+
+  #load background image
+  bg_image = pygame.image.load("assets/images/background/background.jpg").convert_alpha()
+
+  #load spritesheets
+  warrior_sheet = pygame.image.load("assets/images/warrior/Sprites/warrior.png").convert_alpha()
+  wizard_sheet = pygame.image.load("assets/images/wizard/Sprites/wizard.png").convert_alpha()
+
+  #load vicory image
+  victory_img = pygame.image.load("assets/images/icons/victory.png").convert_alpha()
+
+  #define number of steps in each animation
+  WARRIOR_ANIMATION_STEPS = [10, 8, 1, 7, 7, 3, 7]
+  WIZARD_ANIMATION_STEPS = [8, 8, 1, 8, 8, 3, 7]
+
+  #define font
+  count_font = pygame.font.Font("assets/fonts/turok.ttf", 80)
+  score_font = pygame.font.Font("assets/fonts/turok.ttf", 30)
+
+  #function for drawing text
+  def draw_text(text, font, text_col, x, y):
+    img = font.render(text, True, text_col)
+    screen.blit(img, (x, y))
+
+  #function for drawing background
+  def draw_bg():
+    scaled_bg = pygame.transform.scale(bg_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
+    screen.blit(scaled_bg, (0, 0))
+
+  #function for drawing fighter health bars
+  def draw_health_bar(health, x, y):
+    ratio = health / 100
+    pygame.draw.rect(screen, WHITE, (x - 2, y - 2, 404, 34))
+    pygame.draw.rect(screen, RED, (x, y, 400, 30))
+    pygame.draw.rect(screen, YELLOW, (x, y, 400 * ratio, 30))
+
+
+  #create two instances of fighters
+  fighter_1 = Fighter(1, 200, 310, False, WARRIOR_DATA, warrior_sheet, WARRIOR_ANIMATION_STEPS, sword_fx)
+  fighter_2 = Fighter(2, 700, 310, True, WIZARD_DATA, wizard_sheet, WIZARD_ANIMATION_STEPS, magic_fx)
+
+  #game loop
+  run = True
+  while run:
+
+    clock.tick(FPS)
+
+    #draw background
+    draw_bg()
+
+    #show player stats
+    draw_health_bar(fighter_1.health, 20, 20)
+    draw_health_bar(fighter_2.health, 580, 20)
+    draw_text("P1: " + str(score[0]), score_font, RED, 20, 60)
+    draw_text("P2: " + str(score[1]), score_font, RED, 580, 60)
+
+    #update countdown
+    if intro_count <= 0:
+      #move fighters
+      fighter_1.move(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter_2, round_over)
+      fighter_2.move(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter_1, round_over)
+    else:
+      #display count timer
+      draw_text(str(intro_count), count_font, RED, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3)
+      #update count timer
+      if (pygame.time.get_ticks() - last_count_update) >= 1000:
+        intro_count -= 1
+        last_count_update = pygame.time.get_ticks()
+
+    #update fighters
+    fighter_1.update()
+    fighter_2.update()
+
+    #draw fighters
+    fighter_1.draw(screen)
+    fighter_2.draw(screen)
+
+    #check for player defeat
+    if round_over == False:
+      if fighter_1.alive == False:
+        score[1] += 1
+        round_over = True
+        round_over_time = pygame.time.get_ticks()
+      elif fighter_2.alive == False:
+        score[0] += 1
+        round_over = True
+        round_over_time = pygame.time.get_ticks()
+    else:
+      #display victory image
+      screen.blit(victory_img, (360, 150))
+      if pygame.time.get_ticks() - round_over_time > ROUND_OVER_COOLDOWN:
+        round_over = False
+        intro_count = 3
+        fighter_1 = Fighter(1, 200, 310, False, WARRIOR_DATA, warrior_sheet, WARRIOR_ANIMATION_STEPS, sword_fx)
+        fighter_2 = Fighter(2, 700, 310, True, WIZARD_DATA, wizard_sheet, WIZARD_ANIMATION_STEPS, magic_fx)
+
+    #event handler
+    for event in pygame.event.get():
+      if event.type == pygame.QUIT:
+        run = False
+
+
+    #update display
+    pygame.display.update()
+
+  #exit pygame
+  pygame.quit()
+def Menu():
+
+    # Initialize Pygame
+    pygame.init()
+
+    # Set up display
+    width, height = 800, 600
+    screen = pygame.display.set_mode((width, height))
+    pygame.display.set_caption("Pygame Main Menu")
+
+    # Colors
+    white = (255, 255, 255)
+    black = (0, 0, 0)
+    gray = (192, 192, 192)
+
+    # Fonts
+    font = pygame.font.Font(None, 36)
+
+    # Button class
+    class Button:
+        def __init__(self, text, x, y, width, height, color, hover_color, action):
+            self.rect = pygame.Rect(x, y, width, height)
+            self.color = color
+            self.hover_color = hover_color
+            self.text = text
+            self.action = action
+
+        def draw(self):
+            pygame.draw.rect(screen, self.color, self.rect)
+            pygame.draw.rect(screen, black, self.rect, 2)
+
+            # Center the text
+            text_surface = font.render(self.text, True, black)
+            text_rect = text_surface.get_rect(center=self.rect.center)
+            screen.blit(text_surface, text_rect)
+
+        def is_hovered(self):
+            return self.rect.collidepoint(pygame.mouse.get_pos())
+
+    # Main menu buttons
+    start_button = Button("Start", 300, 200, 200, 50, gray, white, "start")
+    credit_button = Button("Credit", 300, 300, 200, 50, gray, white, "credit")
+    quit_button = Button("Quit", 300, 400, 200, 50, gray, white, "quit")
+
+    buttons = [start_button, credit_button, quit_button]
+
+    # Main game loop
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                for button in buttons:
+                    if button.is_hovered():
+                        if button.action == "start":
+                            print("Start button clicked")
+                            MainGame()
+                            # Add your start button action here
+                        elif button.action == "credit":
+                            print("Credit button clicked")
+                            # Add your credit button action here
+                        elif button.action == "quit":
+                            print("Quit button clicked")
+                            pygame.quit()
+                            sys.exit()
+
+        screen.fill(white)
+
+        for button in buttons:
+            if button.is_hovered():
+                button.color = button.hover_color
+            else:
+                button.color = gray
+            button.draw()
+
+        pygame.display.flip()
+    
+Menu()
